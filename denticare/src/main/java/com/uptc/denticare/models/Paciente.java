@@ -1,34 +1,40 @@
 package com.uptc.denticare.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 
-//es la representacion en Java de la tabla fisica "paciente" en db.
-@Entity 
-//esta nos indica a SpringBoot  exactamente como se llama en SQL 
+// Representación en Java de la tabla "paciente" en PostgreSQL.
+@Data
+@Entity
 @Table(name = "paciente")
-//@Data: usamos Lombok para encargarse de los gets and stters 
-@Data 
-
 public class Paciente {
-    // @Id: Me identifico como la Llave Primaria (Primary Key) de esta tabla.
+
+    // Llave primaria autoincremental en PostgreSQL (IDENTITY / SERIAL).
     @Id
-    // GenerationType.IDENTITY: Le digo a Java que deje que PostgreSQL genere mi ID automáticamente (el famoso tipo SERIAL).
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_paciente")
     private Long idPaciente;
 
-    // Me vinculo con el ID de la tabla "persona" (donde guardaremos el nombre, cédula, etc.).
-    // Soy unique = true porque un paciente solo puede estar ligado a una persona física.
+    // Referencia a la tabla "persona" (nombre, documento, contacto, etc.).
+    // unique = true garantiza relación 1:1 con persona y nullable = false exige integridad.
     @Column(name = "id_persona", unique = true, nullable = false)
     private Long idPersona;
 
-    // LocalDate: Soy la clase moderna de Java para manejar fechas. 
-    // Al guardar en PostgreSQL, me convierto nativamente al tipo DATE (formato YYYY-MM-DD), sin incluir las horas.
+    // Fecha de nacimiento sin componente horario (DATE en PostgreSQL).
     @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
+
+    // Relación 1:1 bidireccional con HistoriaClinica.
+    // @JsonIgnore evita recursión infinita al serializar JSON (Paciente -> HistoriaClinica -> Paciente).
+    @JsonIgnore
+    @OneToOne(mappedBy = "paciente", cascade = CascadeType.ALL)
+    private HistoriaClinica historiaClinica;
+
+    // Relación 1:N con Cita (consistente con el JSON de citas que ya probaste).
+    @JsonIgnore
+    @OneToMany(mappedBy = "paciente", cascade = CascadeType.ALL)
+    private List<Cita> citas;
 }
-
-    
-
