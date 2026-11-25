@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,33 +25,33 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        
-        // 1. Buscamos el token en la cabecera 'Authorization' de Postman
-        final String authHeader = request.getHeader("Authorization");
-        String username = null;
-        String jwt = null;
 
-        // 2. Verificamos que exista y empiece con "Bearer "
+        // 1. Buscamos el token en la cabecera 'Authorization'
+        final String authHeader = request.getHeader("Authorization");
+
+        // 2. Verificamos que exista la cabecera y tenga el prefijo "Bearer "
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7); // Quitamos la palabra "Bearer "
-            try {
-                username = jwtUtil.extraerUsername(jwt); // Intentamos leerlo
-            } catch (Exception e) {
-                System.out.println("Token inválido o manipulado");
+            String jwt = authHeader.substring(7).trim();
+
+            // 3. Validamos firma y expiración del token usando JwtUtil
+            if (!jwt.isEmpty() && jwtUtil.validarToken(jwt)) {
+                String username = jwtUtil.extraerUsername(jwt);
+
+                // Si el usuario aún no tiene autenticación en este request, la registramos
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            username, null, new ArrayList<>());
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            } else {
+                // Token inválido, expirado o manipulado: limpiamos cualquier contexto previo
+                SecurityContextHolder.clearContext();
             }
         }
 
-        // 3. Si el token es válido y el usuario aún no está logueado en este request
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Creamos un pase de acceso temporal para Spring Security
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    username, null, new ArrayList<>());
-            
-            // Le decimos a Spring: "Este usuario ya pasó seguridad, déjalo entrar"
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        }
-
-        // 4. Continuamos con el viaje de la petición hacia el controlador
+        // 4. Continuamos con la cadena de filtros hacia el controlador o Spring Security
         chain.doFilter(request, response);
     }
 }

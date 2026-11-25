@@ -131,4 +131,18 @@ public class FacturaService {
         factura.setEstadoPago("ANULADA");
         return facturaRepository.save(factura);
     }
+
+    @Transactional(readOnly = true)
+    public Page<Factura> listarFacturas(Pageable pageable) {
+        return facturaRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Factura> listarFacturas(String estadoPago, Pageable pageable) {
+    if (estadoPago != null && !estadoPago.isBlank()) {
+        return facturaRepository.findByEstadoPagoOrderByFechaEmisionDesc(
+                estadoPago.trim().toUpperCase(), pageable);
+    }
+        return facturaRepository.findAll(pageable);
+    }
 }

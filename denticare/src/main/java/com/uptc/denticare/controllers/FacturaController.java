@@ -48,6 +48,17 @@ public class FacturaController {
         return ResponseEntity.ok(facturas);
     }
 
+    // GET: Listar todas las facturas con paginación (ej: /api/facturas?page=0&size=10)
+@GetMapping
+public ResponseEntity<Page<Factura>> listarTodas(
+        @RequestParam(required = false) String estadoPago,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+
+    Pageable pageable = PageRequest.of(page, size);
+    return ResponseEntity.ok(facturaService.listarFacturas(estadoPago, pageable));
+}
+
     // GET: Consultar una factura específica por su ID (sin paginación, es un único registro)
     @GetMapping("/{idFactura}")
     public ResponseEntity<Factura> obtenerPorId(@PathVariable Long idFactura) {

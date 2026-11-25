@@ -20,6 +20,8 @@ public interface FacturaRepository extends JpaRepository<Factura, Long> {
 
     // 2. Historial de un paciente CON PAGINACIÓN (Ej: Mostrar de 10 en 10, no las 5,000 de golpe)
     Page<Factura> findByPaciente_IdPacienteOrderByFechaEmisionDesc(Long idPaciente, Pageable pageable);
+    //-Por estado de la Factura 
+    Page<Factura> findByEstadoPagoOrderByFechaEmisionDesc(String estadoPago, Pageable pageable);
 
     // 3. Control de Morosos: Buscar facturas por estado de pago ("PENDIENTE") con paginación
     Page<Factura> findByEstadoPagoOrderByFechaEmisionAsc(String estadoPago, Pageable pageable);
