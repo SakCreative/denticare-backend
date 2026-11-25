@@ -22,5 +22,8 @@ public class Usuario {
 
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
+
+    @Column(name = "rol", length = 20)
+    private String rol;
     
 }
