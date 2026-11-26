@@ -1,10 +1,12 @@
 package com.uptc.denticare.controllers;
 
 import com.uptc.denticare.models.Cita;
+import com.uptc.denticare.dto.AgendarCitaDTO;
 import com.uptc.denticare.services.CitaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -81,4 +83,14 @@ public class CitaController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PostMapping("/completa")
+public ResponseEntity<?> agendarCitaCompleta(@RequestBody AgendarCitaDTO dto) {
+    try {
+        Cita citaGuardada = citaService.agendarCitaCompleta(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(citaGuardada);
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+}
 }

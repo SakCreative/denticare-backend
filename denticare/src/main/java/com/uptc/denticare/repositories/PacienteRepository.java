@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
+    Optional<Paciente> findByIdPersona(Long idPersona);
+
     @Query("SELECT p FROM Paciente p LEFT JOIN FETCH p.historiaClinica WHERE p.idPaciente = :id")
     Optional<Paciente> findByIdConHistoria(@Param("id") Long id);
 
