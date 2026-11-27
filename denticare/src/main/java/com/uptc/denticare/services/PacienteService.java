@@ -2,12 +2,14 @@ package com.uptc.denticare.services;
 
 import com.uptc.denticare.models.Paciente;
 import com.uptc.denticare.repositories.PacienteRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.List;
 
 /**
  * Capa de servicio para la gestión de pacientes en DentiCare.
@@ -62,6 +64,12 @@ public class PacienteService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No se encontró el paciente con id: " + idPaciente));
     }
+
+    public List<Paciente> obtenerTodos() {
+    return pacienteRepository.findAll();
+}
+
+    
 
     /**
      * Actualiza los datos editables del paciente sin romper sus relaciones clínicas ni de facturación.
