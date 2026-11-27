@@ -66,6 +66,9 @@ public class SecurityConfig {
 
             // Configuramos las reglas de autorización para las peticiones HTTP:
             .authorizeHttpRequests(auth -> auth
+
+                .requestMatchers(HttpMethod.GET, "/api/pacientes/todos").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/personas/todas").permitAll()
                 // permitAll(): Permite el acceso sin autenticación a la ruta de login.
                 .requestMatchers("/api/auth/**").permitAll()
                 

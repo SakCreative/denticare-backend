@@ -1,5 +1,4 @@
 package com.uptc.denticare.controllers;
-
 import com.uptc.denticare.models.Paciente;
 import com.uptc.denticare.services.PacienteService;
 import org.springframework.data.domain.Page;
@@ -9,6 +8,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Controlador REST para el recurso Paciente (/api/pacientes).
@@ -46,6 +47,8 @@ public class PacienteController {
         return ResponseEntity.ok(pacienteService.buscarPorId(idPaciente));
     }
 
+    
+
     // Actualiza los datos permitidos de un paciente existente.
     @PutMapping("/{idPaciente}")
     public ResponseEntity<Paciente> actualizar(
@@ -53,4 +56,8 @@ public class PacienteController {
             @RequestBody Paciente request) {
         return ResponseEntity.ok(pacienteService.actualizar(idPaciente, request));
     }
+    @GetMapping("/todos")
+    public ResponseEntity<List<Paciente>> obtenerTodos() {
+        return ResponseEntity.ok(pacienteService.obtenerTodos()); // O pacienteRepository.findAll()
+}
 }

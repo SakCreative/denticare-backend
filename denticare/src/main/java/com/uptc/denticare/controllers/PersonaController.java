@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Controlador REST para el recurso Persona (/api/personas).
  * Permite crear personas, listarlas paginadas, consultarlas por ID o documento
@@ -58,4 +60,10 @@ public class PersonaController {
             @RequestBody Persona request) {
         return ResponseEntity.ok(personaService.actualizar(idPersona, request));
     }
+    @GetMapping("/todas")
+    public ResponseEntity<List<Persona>> obtenerTodas() {
+        return ResponseEntity.ok(personaService.obtenerTodas()); // O personaRepository.findAll()
+}
+
+    
 }
